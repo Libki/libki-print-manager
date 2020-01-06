@@ -1,6 +1,8 @@
 #include "systemtray.h"
 
+#include <QDebug>
 #include <QMenu>
+#include <QMessageBox>
 #include <QSystemTrayIcon>
 
 SystemTray::SystemTray(QObject *parent) : QObject(parent)
@@ -10,7 +12,7 @@ SystemTray::SystemTray(QObject *parent) : QObject(parent)
     QMenu *trayIconMenu = new QMenu();
 
     QAction *quitAction = new QAction(QIcon(":images/icons8-shutdown-90.png"), tr("Quit"), this);
-    //connect(logoutAction, SIGNAL(triggered()), this, SLOT(doLogoutDialog()));
+    connect(quitAction, SIGNAL(triggered()), this, SLOT(doQuitAction()));
     trayIconMenu->addAction(quitAction);
 
     QSystemTrayIcon *trayIcon;
@@ -18,6 +20,19 @@ SystemTray::SystemTray(QObject *parent) : QObject(parent)
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(libkiIcon);
     trayIcon->show();
-
 }
 
+void SystemTray::doQuitAction() {
+    qDebug() << "SystemTray::doQuitAction";
+
+    QMessageBox msgBox;
+    msgBox.setText(tr("Are you sure you want to quit?"));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    msgBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+    msgBox.setButtonText(QMessageBox::No, tr("No"));
+    int ret = msgBox.exec();
+    if( ret == QMessageBox::Yes ) {
+        exit(0);
+    }
+}

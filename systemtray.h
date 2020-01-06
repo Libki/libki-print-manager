@@ -11,6 +11,9 @@ public:
 
 signals:
 
+private slots:
+    void doQuitAction();
+
 public slots:
 };
 
