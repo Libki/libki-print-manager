@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>images/libki_clock.png</file>
         <file>images/icons8-shutdown-90.png</file>
+        <file>images/icons8-about-96.png</file>
     </qresource>
 </RCC>

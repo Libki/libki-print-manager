@@ -13,6 +13,7 @@ signals:
 
 private slots:
     void doQuitAction();
+    void doAboutAction();
 
 public slots:
 };
