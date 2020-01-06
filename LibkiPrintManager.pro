@@ -4,8 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
-
+QT       += core gui network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = LibkiPrintManager
@@ -13,12 +12,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    networkclient.cpp \
-    systemtray.cpp
+        networkclient.cpp \
+        systemtray.cpp
 
 HEADERS  += mainwindow.h \
-    networkclient.h \
-    systemtray.h
+         networkclient.h \
+         systemtray.h
 
 FORMS    += mainwindow.ui
 
