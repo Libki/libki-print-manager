@@ -1,7 +1,7 @@
 #include "networkclient.h"
 
 #include <QDebug>
-//#include <QJsonArray>
+#include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkAccessManager>
@@ -39,7 +39,7 @@ void NetworkClient::checkServerForPrintJobs() {
 void NetworkClient::onCheckServerForPrintJobsResult(QNetworkReply *reply){
     qDebug() << "NetworkClient::onCheckServerForPrintJobsResult";
 
-    if(reply->error() == QNetworkReply::NoError){
+    if (reply->error() == QNetworkReply::NoError){
 
         QByteArray result = reply->readAll();
         QJsonDocument jsonResponse = QJsonDocument::fromJson(result);
@@ -54,7 +54,9 @@ void NetworkClient::onCheckServerForPrintJobsResult(QNetworkReply *reply){
         qDebug() << "user_id: " << job["user_id"].toString();
         qDebug() << "print_file_id" << job["print_file_id"].toInt();
 
-        downloadPrintFile(job);
+        if ( job["job_id"].toInt() != 0 ) {
+            downloadPrintFile(job);
+        } // else job was empty, no job to print
     }
     else {
         qDebug() << "ERROR";
@@ -65,6 +67,25 @@ void NetworkClient::onCheckServerForPrintJobsResult(QNetworkReply *reply){
 
 void NetworkClient::downloadPrintFile(QJsonObject job) {
     qDebug() << "NetworkClient::downloadPrintFile";
-
     qDebug() << "Job ID:" << job["job_id"].toInt();
+
+    QNetworkAccessManager *nam = new QNetworkAccessManager(this);
+    connect(nam, &QNetworkAccessManager::finished, this, &NetworkClient::downloadPrintFileFinished);
+
+    QUrl url = QUrl("http://192.168.56.1:3000/api/printmanager/v1_0/get_file/" + job["job_id"].toString() ); //TODO: Move address and port to config file
+    nam->get(QNetworkRequest(url));
 }
+
+void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
+    qDebug() << "NetworkClient::downloadPrintFileFinished";
+
+    QFile localFile("downloadedfile.pdf");
+    if (!localFile.open(QIODevice::WriteOnly))
+        return;
+    localFile.write(reply->readAll());
+    localFile.close();
+
+    reply->deleteLater();
+    qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+}
+

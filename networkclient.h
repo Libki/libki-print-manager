@@ -23,6 +23,8 @@ public slots:
 private slots:
     void checkServerForPrintJobs();
     void onCheckServerForPrintJobsResult(QNetworkReply *reply);
+    void downloadPrintFileFinished(QNetworkReply *reply);
+
 };
 
 #endif // NETWORKCLIENT_H
