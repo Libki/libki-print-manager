@@ -12,11 +12,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         networkclient.cpp \
-        systemtray.cpp
+        systemtray.cpp \
+    printclient.cpp
 
 HEADERS  += \
          networkclient.h \
-         systemtray.h
+         systemtray.h \
+    printclient.h
 
 FORMS    += mainwindow.ui
 

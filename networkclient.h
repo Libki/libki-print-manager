@@ -14,6 +14,7 @@ public:
 
 private:
     QTimer *checkServerForPrintJobsTimer;
+    void downloadPrintFile(QJsonObject job);
 
 signals:
 
@@ -22,7 +23,6 @@ public slots:
 private slots:
     void checkServerForPrintJobs();
     void onCheckServerForPrintJobsResult(QNetworkReply *reply);
-
 };
 
 #endif // NETWORKCLIENT_H

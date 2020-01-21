@@ -54,11 +54,17 @@ void NetworkClient::onCheckServerForPrintJobsResult(QNetworkReply *reply){
         qDebug() << "user_id: " << job["user_id"].toString();
         qDebug() << "print_file_id" << job["print_file_id"].toInt();
 
-
+        downloadPrintFile(job);
     }
     else {
         qDebug() << "ERROR";
     }
 
     reply->deleteLater();
+}
+
+void NetworkClient::downloadPrintFile(QJsonObject job) {
+    qDebug() << "NetworkClient::downloadPrintFile";
+
+    qDebug() << "Job ID:" << job["job_id"].toInt();
 }
