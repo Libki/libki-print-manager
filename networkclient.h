@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+#include <QtNetwork/QNetworkReply>
 #include <QTimer>
 
 class NetworkClient : public QObject
@@ -20,6 +21,7 @@ public slots:
 
 private slots:
     void checkServerForPrintJobs();
+    void onCheckServerForPrintJobsResult(QNetworkReply *reply);
 
 };
 
