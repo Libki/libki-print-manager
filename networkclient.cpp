@@ -9,6 +9,8 @@
 #include <QNetworkRequest>
 #include <QUrl>
 #include <QUrlQuery>
+#include <QDir>
+#include <QProcess>
 
 NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 {
@@ -72,18 +74,31 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
     QNetworkAccessManager *nam = new QNetworkAccessManager(this);
     connect(nam, &QNetworkAccessManager::finished, this, &NetworkClient::downloadPrintFileFinished);
 
-    QUrl url = QUrl("http://192.168.56.1:3000/api/printmanager/v1_0/get_file/" + job["job_id"].toString() ); //TODO: Move address and port to config file
+    QString print_file_id = QString(QString::number(job["print_file_id"].toInt()));
+    qDebug() << "Print File ID: " << print_file_id;
+
+    QUrl url = QUrl("http://192.168.56.1:3000/api/printmanager/v1_0/get_file/" + print_file_id ); //TODO: Move address and port to config file
+    qDebug() << "PDF URL: " << url.toString();
     nam->get(QNetworkRequest(url));
 }
 
 void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     qDebug() << "NetworkClient::downloadPrintFileFinished";
 
-    QFile localFile("downloadedfile.pdf");
+    QString fileId = reply->rawHeader("File-Id");
+    qDebug() << "FILE ID: " + fileId;
+
+    QString tempDir = QDir::tempPath();
+    qDebug() << "Temp Dir: " << tempDir;
+
+    QString tempFile = tempDir + "/" + fileId + ".pdf";
+    QFile localFile( tempFile );
     if (!localFile.open(QIODevice::WriteOnly))
         return;
     localFile.write(reply->readAll());
     localFile.close();
+
+    QProcess::startDetached("C:\\SumatraPDF.exe -print-to BrotherLaser " + tempFile);
 
     reply->deleteLater();
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
