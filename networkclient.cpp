@@ -30,7 +30,7 @@ void NetworkClient::checkServerForPrintJobs() {
     QUrlQuery query;
     query.addQueryItem("name", "PrintManager1"); //TODO: Move name to config file
 
-    QUrl url = QUrl("http://192.168.56.1:3000/api/printmanager/v1_0/get_pending_job/"); //TODO: Move address and port to config file
+    QUrl url = QUrl("http://10.0.2.2:3000/api/printmanager/v1_0/get_pending_job/"); //TODO: Move address and port to config file
     url.setQuery(query);
 
     qDebug()<< "url: "<< url.toString(QUrl::FullyEncoded);
@@ -88,8 +88,10 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 
     QJsonObject job = reply->property("job").toJsonObject();
     qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
+    qDebug() << "PRINT FILE ID: " << QString::number( job["job_id"].toInt() );
 
-    QString fileId = reply->rawHeader("File-Id");
+    //QString fileId = reply->rawHeader("File-Id");
+    QString fileId = QString::number( job["job_id"].toInt() );
     qDebug() << "FILE ID: " + fileId;
 
     QString tempDir = QDir::tempPath();
@@ -105,7 +107,9 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 //  QProcess::startDetached("C:\\SumatraPDF.exe -print-to BrotherLaser " + tempFile);
     QProcess sumatra;
     qDebug() << "PRINTING TO START";
-    sumatra.start("C:\\SumatraPDF.exe -silent -print-to BrotherLaser " + tempFile);
+    QString command = "C:\\SumatraPDF.exe -silent -print-to BrotherLaser " + tempFile;
+    qDebug() << "PRINT COMMAND: " << command;
+    sumatra.start(command);
     sumatra.waitForStarted();
 
     qDebug() << "PRINTING STARTED";
