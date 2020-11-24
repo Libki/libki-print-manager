@@ -15,6 +15,7 @@ public:
 private:
     QTimer *checkServerForPrintJobsTimer;
     void downloadPrintFile(QJsonObject job);
+    QString libkiServerAddress;
 
 signals:
 
