@@ -112,6 +112,10 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "FILE ID: " + jobId;
         QString physicalPrinterName = job["physical_printer_name"].toString();
         qDebug() << "PRINTER NAME: " << physicalPrinterName;
+        QString chroming = job["chroming"].toString();
+        qDebug() << "CHROMING: " << chroming;
+        QString plexing = job["plexing"].toString();
+        qDebug() << "PLEXING: " << plexing;
 
         QNetworkAccessManager nam;
         nam.get(QNetworkRequest(QUrl(libkiServerAddress + "/api/printmanager/v1_0/job/" + jobId + "/InProgress" )));
@@ -131,7 +135,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 
         QProcess sumatra;
         qDebug() << "PRINTING TO START";
-        QString command = "C:\\SumatraPDF.exe -silent -print-to " + physicalPrinterName + " " + tempFile;
+        QString command = QString("C:\\SumatraPDF.exe -silent  -print-settings \"%1,%2\" -print-to %3 %4").arg(chroming, plexing, physicalPrinterName, tempFile);
         qDebug() << "PRINT COMMAND: " << command;
         sumatra.start(command);
         sumatra.waitForStarted();
@@ -142,10 +146,15 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 
         if ( sumatra.exitStatus() == QProcess::NormalExit && sumatra.exitCode() == 0 ) {
             qDebug() << "PRINTING " << tempFile << " SUCEEDED!";
-            nam.get(QNetworkRequest(QUrl(libkiServerAddress + "/api/printmanager/v1_0/job/" + jobId + "/Done" )));
+            QString url = QString("%1/api/printmanager/v1_0/job/%2/Done").arg(libkiServerAddress, jobId);
+            qDebug() << "DONE URL: " << url;
+            nam.get(QNetworkRequest(url));
+            qDebug() << "NET REQUEST DONE!";
         } else {
             qDebug() << "PRINTING " << tempFile << " FAILED!";
-            nam.get(QNetworkRequest(QUrl(libkiServerAddress + "/api/printmanager/v1_0/job/" + jobId + "/Error" )));
+            QString url = QString("%1/api/printmanager/v1_0/job/%2/Error").arg(libkiServerAddress, jobId);
+            qDebug() << "ERROR URL: " << url;
+            nam.get(QNetworkRequest(url));
         }
 
         reply->deleteLater();
