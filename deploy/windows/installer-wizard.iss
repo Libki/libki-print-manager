@@ -45,7 +45,7 @@ Source: "C:\Qt\Tools\mingw492_32\opt\bin\libeay32.dll"; DestDir: "{app}"; Flags:
 Source: "C:\Qt\Tools\mingw492_32\opt\bin\ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
 
 [Registry]
-Root: "HKLM"; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: String; ValueName: "Libki"; ValueData: "{app}\LibkiPrintManager.exe"; Flags: createvalueifdoesntexist uninsdeletekey; MinVersion: 0.0,5.0; Check: CheckStartAfterShell
+Root: "HKLM"; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: String; ValueName: "Libki"; ValueData: "{app}\LibkiPrintManager.exe"; Flags: createvalueifdoesntexist uninsdeletekey; MinVersion: 0.0,5.0;
 
 [CustomMessages]
 NameAndVersion=%1 version %2
@@ -66,10 +66,6 @@ Filename: "{commonappdata}\Libki\Libki Kiosk Management System.ini"; Section: "s
 [Code]
 var
   ServerPage: TInputQueryWizardPage;
-  ClientPage: TInputQueryWizardPage;
-  StartupModePage: TInputOptionWizardPage;
-  RebootActionPage: TInputOptionWizardPage;
-  PasswordPage: TInputQueryWizardPage;
 
 procedure InitializeWizard;
 begin
