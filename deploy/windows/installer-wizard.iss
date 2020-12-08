@@ -59,9 +59,7 @@ AssocFileExtension=&Associate %1 with the %2 file extension
 AssocingFileExtension=Associating %1 with the %2 file extension...
 
 [INI]
-Filename: "{commonappdata}\Libki\Libki Kiosk Management System.ini"; Section: "server"; Key: "host"; String: "{code:GetHost}"
-Filename: "{commonappdata}\Libki\Libki Kiosk Management System.ini"; Section: "server"; Key: "port"; String: "{code:GetPort}"
-Filename: "{commonappdata}\Libki\Libki Kiosk Management System.ini"; Section: "server"; Key: "scheme"; String: "{code:GetScheme}"
+Filename: "{commonappdata}\Libki\Libki Print Manager.ini"; Section: "settings"; Key: "server"; String: "{code:GetScheme}://{code:GetHost}:{code:GetPort}"
 
 [Code]
 var
