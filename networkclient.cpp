@@ -104,7 +104,9 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "5) " << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 
         QJsonObject job = reply->property("job").toJsonObject();
-        qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
+        // The line below causes problems when packaged for deployment,
+        // the c string library is not included in libstdc++-6.dll apparently
+        //qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
         qDebug() << "PRINT FILE ID: " << QString::number( job["job_id"].toInt() );
 
         //QString jobId = reply->rawHeader("File-Id");
