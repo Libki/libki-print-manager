@@ -86,7 +86,7 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
     QUrl url = QUrl( libkiServerAddress + "/api/printmanager/v1_0/get_file/" + print_file_id );
     qDebug() << "DOWNLOADING PDF FROM URL: " << url.toString();
     QNetworkReply* reply = nam->get(QNetworkRequest(url));
-    reply->setProperty("job", job);
+    /*reply->setProperty("job", job);*/
 }
 
 void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
@@ -103,6 +103,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "4) " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         qDebug() << "5) " << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 
+        /*
         QJsonObject job = reply->property("job").toJsonObject();
         qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
         qDebug() << "PRINT FILE ID: " << QString::number( job["job_id"].toInt() );
@@ -161,6 +162,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 
         QFile file(tempFile);
         file.remove();
+        */
     }
 }
 
