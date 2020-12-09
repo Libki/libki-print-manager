@@ -23,3 +23,5 @@ HEADERS  += \
 FORMS    += mainwindow.ui
 
 RESOURCES += libki.qrc
+
+RC_FILE += libki_print_manager.rc
