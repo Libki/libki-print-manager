@@ -23,6 +23,9 @@ build_script:
   - cd deploy\windows
   - ISCC.exe installer-wizard.iss
 
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
 # defines what we can export from the build environment
 artifacts:
   - path: 'deploy\windows\Output\Libki_Print_Manager_Installer.exe'
