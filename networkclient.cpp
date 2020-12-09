@@ -79,15 +79,11 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
 
     QUrl url = QUrl("http://192.168.56.1:3000/api/printmanager/v1_0/get_file/" + print_file_id ); //TODO: Move address and port to config file
     qDebug() << "PDF URL: " << url.toString();
-    QNetworkReply* reply = nam->get(QNetworkRequest(url));
-    reply->setProperty("job", job);
+    nam->get(QNetworkRequest(url));
 }
 
 void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     qDebug() << "NetworkClient::downloadPrintFileFinished";
-
-    QJsonObject job = reply->property("job").toJsonObject();
-    qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
 
     QString fileId = reply->rawHeader("File-Id");
     qDebug() << "FILE ID: " + fileId;
@@ -102,25 +98,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     localFile.write(reply->readAll());
     localFile.close();
 
-//  QProcess::startDetached("C:\\SumatraPDF.exe -print-to BrotherLaser " + tempFile);
-    QProcess sumatra;
-    qDebug() << "PRINTING TO START";
-    sumatra.start("C:\\SumatraPDF.exe -silent -print-to BrotherLaser " + tempFile);
-    sumatra.waitForStarted();
-
-    qDebug() << "PRINTING STARTED";
-
-    sumatra.waitForFinished();
-    qDebug() << "PRINTING DONE!";
-
-    if ( sumatra.exitStatus() == QProcess::NormalExit ) {
-        qDebug() << "EXIT STATUS: " << sumatra.exitCode();
-        if ( sumatra.exitCode() == 0 ) {
-            qDebug() << "PRINTING " << tempFile << " SUCEEDED!";
-        }
-    } else {
-        qDebug() << "PRINTING " << tempFile << " FAILED!";
-    }
+    QProcess::startDetached("C:\\SumatraPDF.exe -print-to BrotherLaser " + tempFile);
 
     reply->deleteLater();
     qDebug() << "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
