@@ -104,9 +104,9 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "5) " << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 
         QJsonObject job = reply->property("job").toJsonObject();
+        /*
         qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
         qDebug() << "PRINT FILE ID: " << QString::number( job["job_id"].toInt() );
-        /*
 
         //QString jobId = reply->rawHeader("File-Id");
         QString jobId = QString::number( job["job_id"].toInt() );
