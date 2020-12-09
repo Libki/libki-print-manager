@@ -103,7 +103,6 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "4) " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
         qDebug() << "5) " << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 
-        /*
         QJsonObject job = reply->property("job").toJsonObject();
         qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
         qDebug() << "PRINT FILE ID: " << QString::number( job["job_id"].toInt() );
@@ -117,6 +116,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "CHROMING: " << chroming;
         QString plexing = job["plexing"].toString();
         qDebug() << "PLEXING: " << plexing;
+        /*
 
         QNetworkAccessManager nam;
         nam.get(QNetworkRequest(QUrl(libkiServerAddress + "/api/printmanager/v1_0/job/" + jobId + "/InProgress" )));
