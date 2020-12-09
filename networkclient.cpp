@@ -119,10 +119,11 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         QString plexing = job["plexing"].toString();
         qDebug() << "PLEXING: " << plexing;
 
-        QNetworkAccessManager nam;
+        QNetworkAccessManager *nam = new QNetworkAccessManager(this);
         QString url = QString("%1/api/printmanager/v1_0/job/%2/InProgress").arg(libkiServerAddress, jobId);
+        qDebug() << "IN PROGRESS URL: " << url;
         QNetworkRequest req = QNetworkRequest(QUrl(url));
-        nam.get(req);
+        nam->get(req);
 
         QString tempDir = QDir::tempPath();
         qDebug() << "Temp Dir: " << tempDir;
@@ -149,18 +150,19 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "EXIT STATUS: " << sumatra.exitCode();
 
         if ( sumatra.exitStatus() == QProcess::NormalExit && sumatra.exitCode() == 0 ) {
+            url = QString("%1/api/printmanager/v1_0/job/%2/Done").arg(libkiServerAddress, jobId);
+            req = QNetworkRequest(QUrl(url));
+            nam->get(req);
+
             qDebug() << "PRINTING " << tempFile << " SUCEEDED!";
-            QString url = QString("%1/api/printmanager/v1_0/job/%2/Done").arg(libkiServerAddress, jobId);
-            qDebug() << "DONE URL: " << url;
-            QNetworkRequest req = QNetworkRequest(QUrl(url));
-            nam.get(req);
-            qDebug() << "NET REQUEST DONE!";
+            qDebug() << "D1 DONE URL: " << url;
         } else {
+            url = QString("%1/api/printmanager/v1_0/job/%2/Error").arg(libkiServerAddress, jobId);
+            req = QNetworkRequest(QUrl(url));
+            nam->get(req);
+
             qDebug() << "PRINTING " << tempFile << " FAILED!";
-            QString url = QString("%1/api/printmanager/v1_0/job/%2/Error").arg(libkiServerAddress, jobId);
             qDebug() << "ERROR URL: " << url;
-            QNetworkRequest req = QNetworkRequest(QUrl(url));
-            nam.get(req);
         }
 
         reply->deleteLater();
