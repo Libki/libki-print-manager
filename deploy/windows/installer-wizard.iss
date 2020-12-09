@@ -15,6 +15,7 @@ AllowNoIcons=yes
 
 [Files]
 Source: "LibkiPrintManager.exe"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
+Source: "SumatraPDF.exe"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
 
 Source: "C:\Qt\5.5\mingw492_32\bin\Qt5Core.dll"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
 Source: "C:\Qt\5.5\mingw492_32\bin\Qt5Gui.dll"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
