@@ -16,6 +16,7 @@ install:
   - set PATH=%PATH%;C:\MinGW\bin;%QTDIR%\bin;"C:\\Program Files (x86)\\Inno Setup 5"
 
 build_script:
+  - gcc -print-file-name=libstdc++-6.dll
   - qmake LibkiPrintManager.pro
   - mingw32-make
   - dir release
