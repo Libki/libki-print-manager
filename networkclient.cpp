@@ -83,16 +83,84 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
     QString print_file_id = QString(QString::number(job["print_file_id"].toInt()));
     qDebug() << "Print File ID: " << print_file_id;
 
-    QUrl url = QUrl("http://192.168.56.1:3000/api/printmanager/v1_0/get_file/" + print_file_id ); //TODO: Move address and port to config file
-    qDebug() << "PDF URL: " << url.toString();
-    nam->get(QNetworkRequest(url));
+    QUrl url = QUrl( libkiServerAddress + "/api/printmanager/v1_0/get_file/" + print_file_id );
+    qDebug() << "DOWNLOADING PDF FROM URL: " << url.toString();
+    QNetworkReply* reply = nam->get(QNetworkRequest(url));
+    reply->setProperty("job", job);
 }
 
 void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     qDebug() << "NetworkClient::downloadPrintFileFinished";
 
 
-    reply->deleteLater();
+    if (reply->error()) {
+        qDebug() << "ERROR!";
+        qDebug() << reply->errorString();
+    } else {
+        qDebug() << "1) " << reply->header(QNetworkRequest::ContentTypeHeader).toString();
+        qDebug() << "2) " << reply->header(QNetworkRequest::LastModifiedHeader).toDateTime().toString();
+        qDebug() << "3) " << reply->header(QNetworkRequest::ContentLengthHeader).toULongLong();
+        qDebug() << "4) " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+        qDebug() << "5) " << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 
+        QJsonObject job = reply->property("job").toJsonObject();
+        qDebug() << "JOB: " << QJsonDocument(job).toJson(QJsonDocument::Compact).toStdString().c_str();
+        qDebug() << "PRINT FILE ID: " << QString::number( job["job_id"].toInt() );
+
+        //QString jobId = reply->rawHeader("File-Id");
+        QString jobId = QString::number( job["job_id"].toInt() );
+        qDebug() << "FILE ID: " + jobId;
+        QString physicalPrinterName = job["physical_printer_name"].toString();
+        qDebug() << "PRINTER NAME: " << physicalPrinterName;
+        QString chroming = job["chroming"].toString();
+        qDebug() << "CHROMING: " << chroming;
+        QString plexing = job["plexing"].toString();
+        qDebug() << "PLEXING: " << plexing;
+
+        QNetworkAccessManager nam;
+        nam.get(QNetworkRequest(QUrl(libkiServerAddress + "/api/printmanager/v1_0/job/" + jobId + "/InProgress" )));
+
+        QString tempDir = QDir::tempPath();
+        qDebug() << "Temp Dir: " << tempDir;
+
+        QString tempFile = tempDir + "/" + jobId + ".pdf";
+        QFile localFile(tempFile);
+        if (localFile.open(QIODevice::WriteOnly)) {
+           localFile.write(reply->readAll());
+           localFile.flush();
+           localFile.close();
+        } else {
+            qDebug() << "Failed to open file for writing: " + tempFile;
+        }
+
+        QProcess sumatra;
+        qDebug() << "PRINTING TO START";
+        QString command = QString("C:\\SumatraPDF.exe -silent  -print-settings \"%1,%2\" -print-to %3 %4").arg(chroming, plexing, physicalPrinterName, tempFile);
+        qDebug() << "PRINT COMMAND: " << command;
+        sumatra.start(command);
+        sumatra.waitForStarted();
+        qDebug() << "PRINTING STARTED";
+        sumatra.waitForFinished();
+        qDebug() << "PRINTING DONE!";
+        qDebug() << "EXIT STATUS: " << sumatra.exitCode();
+
+        if ( sumatra.exitStatus() == QProcess::NormalExit && sumatra.exitCode() == 0 ) {
+            qDebug() << "PRINTING " << tempFile << " SUCEEDED!";
+            QString url = QString("%1/api/printmanager/v1_0/job/%2/Done").arg(libkiServerAddress, jobId);
+            qDebug() << "DONE URL: " << url;
+            nam.get(QNetworkRequest(url));
+            qDebug() << "NET REQUEST DONE!";
+        } else {
+            qDebug() << "PRINTING " << tempFile << " FAILED!";
+            QString url = QString("%1/api/printmanager/v1_0/job/%2/Error").arg(libkiServerAddress, jobId);
+            qDebug() << "ERROR URL: " << url;
+            nam.get(QNetworkRequest(url));
+        }
+
+        reply->deleteLater();
+
+        QFile file(tempFile);
+        file.remove();
+    }
 }
 
