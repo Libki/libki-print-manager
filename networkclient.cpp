@@ -17,6 +17,8 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 {
     qDebug() << "NetworkClient::NetworkClient";
 
+    namJobStatus = new QNetworkAccessManager(this);
+
     namCheckServerForPrintJobs = new QNetworkAccessManager(this);
     connect(namCheckServerForPrintJobs, &QNetworkAccessManager::finished, this, &NetworkClient::onCheckServerForPrintJobsResult);
 
@@ -119,11 +121,10 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         QString plexing = job["plexing"].toString();
         qDebug() << "PLEXING: " << plexing;
 
-        QNetworkAccessManager *nam = new QNetworkAccessManager(this);
         QString url = QString("%1/api/printmanager/v1_0/job/%2/InProgress").arg(libkiServerAddress, jobId);
         qDebug() << "IN PROGRESS URL: " << url;
         QNetworkRequest req = QNetworkRequest(QUrl(url));
-        nam->get(req);
+        namJobStatus->get(req);
 
         QString tempDir = QDir::tempPath();
         qDebug() << "Temp Dir: " << tempDir;
@@ -154,19 +155,18 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
             req = QNetworkRequest(QUrl(url));
             qDebug() << "DONE URL: " << url;
             qDebug() << "PRINTING " << tempFile << " SUCEEDED!";
-            nam->get(req);
+            namJobStatus->get(req);
             qDebug() << "NETWORK REQUEST SENT: Done";
         } else {
             url = QString("%1/api/printmanager/v1_0/job/%2/Error").arg(libkiServerAddress, jobId);
             req = QNetworkRequest(QUrl(url));
             qDebug() << "PRINTING " << tempFile << " FAILED!";
             qDebug() << "ERROR URL: " << url;
-            nam->get(req);
+            namJobStatus->get(req);
             qDebug() << "NETWORK REQUEST SEND: Error";
         }
 
         reply->deleteLater();
-        nam->deleteLater();
 
         QFile file(tempFile);
         file.remove();

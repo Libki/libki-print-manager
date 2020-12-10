@@ -18,6 +18,7 @@ private:
     QString libkiServerAddress;
     QNetworkAccessManager *namCheckServerForPrintJobs;
     QNetworkAccessManager *namDownloadPrintFileFinished;
+    QNetworkAccessManager *namJobStatus;
 
 signals:
 
