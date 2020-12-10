@@ -166,6 +166,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         }
 
         reply->deleteLater();
+        nam->deleteLater();
 
         QFile file(tempFile);
         file.remove();
