@@ -11,15 +11,13 @@ TARGET = LibkiPrintManager
 TEMPLATE = app
 
 SOURCES += main.cpp\
-        networkclient.cpp \
-        systemtray.cpp \
-    printclient.cpp \
+    networkclient.cpp \
+    systemtray.cpp \
     logutils.cpp
 
 HEADERS  += \
-         networkclient.h \
-         systemtray.h \
-    printclient.h \
+    networkclient.h \
+    systemtray.h \
     logutils.h
 
 FORMS    += mainwindow.ui
