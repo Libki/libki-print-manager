@@ -17,6 +17,9 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 {
     qDebug() << "NetworkClient::NetworkClient";
 
+    namCheckServerForPrintJobs = new QNetworkAccessManager(this);
+    connect(namCheckServerForPrintJobs, &QNetworkAccessManager::finished, this, &NetworkClient::onCheckServerForPrintJobsResult);
+
     checkServerForPrintJobsTimer = new QTimer(this);
     connect(checkServerForPrintJobsTimer, SIGNAL(timeout()), this, SLOT(checkServerForPrintJobs()));
     checkServerForPrintJobsTimer->start(10 * 1000); //TODO: Move check to a setting?
@@ -30,9 +33,6 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 void NetworkClient::checkServerForPrintJobs() {
     qDebug() << "NetworkClient::checkServerForPrintJobs";
 
-    QNetworkAccessManager *nam = new QNetworkAccessManager(this);
-    connect(nam, &QNetworkAccessManager::finished, this, &NetworkClient::onCheckServerForPrintJobsResult);
-
     QUrlQuery query;
     query.addQueryItem("name", "PrintManager1"); //TODO: Move name to config file
 
@@ -41,7 +41,7 @@ void NetworkClient::checkServerForPrintJobs() {
 
     qDebug()<< "url: "<< url.toString(QUrl::FullyEncoded);
 
-    nam->get(QNetworkRequest(url));
+    namCheckServerForPrintJobs->get(QNetworkRequest(url));
 }
 
 void NetworkClient::onCheckServerForPrintJobsResult(QNetworkReply *reply){
