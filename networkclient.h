@@ -17,6 +17,7 @@ private:
     void downloadPrintFile(QJsonObject job);
     QString libkiServerAddress;
     QNetworkAccessManager *namCheckServerForPrintJobs;
+    QNetworkAccessManager *namDownloadPrintFileFinished;
 
 signals:
 

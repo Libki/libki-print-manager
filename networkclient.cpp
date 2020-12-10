@@ -20,6 +20,9 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
     namCheckServerForPrintJobs = new QNetworkAccessManager(this);
     connect(namCheckServerForPrintJobs, &QNetworkAccessManager::finished, this, &NetworkClient::onCheckServerForPrintJobsResult);
 
+    namDownloadPrintFileFinished = new QNetworkAccessManager(this);
+    connect(namDownloadPrintFileFinished, &QNetworkAccessManager::finished, this, &NetworkClient::downloadPrintFileFinished);
+
     checkServerForPrintJobsTimer = new QTimer(this);
     connect(checkServerForPrintJobsTimer, SIGNAL(timeout()), this, SLOT(checkServerForPrintJobs()));
     checkServerForPrintJobsTimer->start(10 * 1000); //TODO: Move check to a setting?
@@ -77,15 +80,12 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
     qDebug() << "NetworkClient::downloadPrintFile";
     qDebug() << "Job ID:" << job["job_id"].toInt();
 
-    QNetworkAccessManager *nam = new QNetworkAccessManager(this);
-    connect(nam, &QNetworkAccessManager::finished, this, &NetworkClient::downloadPrintFileFinished);
-
     QString print_file_id = QString(QString::number(job["print_file_id"].toInt()));
     qDebug() << "Print File ID: " << print_file_id;
 
     QUrl url = QUrl( libkiServerAddress + "/api/printmanager/v1_0/get_file/" + print_file_id );
     qDebug() << "DOWNLOADING PDF FROM URL: " << url.toString();
-    QNetworkReply* reply = nam->get(QNetworkRequest(url));
+    QNetworkReply* reply = namDownloadPrintFileFinished->get(QNetworkRequest(url));
     reply->setProperty("job", job);
 }
 
@@ -152,17 +152,17 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         if ( sumatra.exitStatus() == QProcess::NormalExit && sumatra.exitCode() == 0 ) {
             url = QString("%1/api/printmanager/v1_0/job/%2/Done").arg(libkiServerAddress, jobId);
             req = QNetworkRequest(QUrl(url));
-            nam->get(req);
-
+            qDebug() << "DONE URL: " << url;
             qDebug() << "PRINTING " << tempFile << " SUCEEDED!";
-            qDebug() << "D1 DONE URL: " << url;
+            nam->get(req);
+            qDebug() << "NETWORK REQUEST SENT: Done";
         } else {
             url = QString("%1/api/printmanager/v1_0/job/%2/Error").arg(libkiServerAddress, jobId);
             req = QNetworkRequest(QUrl(url));
-            nam->get(req);
-
             qDebug() << "PRINTING " << tempFile << " FAILED!";
             qDebug() << "ERROR URL: " << url;
+            nam->get(req);
+            qDebug() << "NETWORK REQUEST SEND: Error";
         }
 
         reply->deleteLater();
