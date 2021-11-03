@@ -14,7 +14,7 @@ Compression=lzma
 AllowNoIcons=yes
 
 [Dirs]
-Name: "{userappdata}\logs"
+Name: "{userappdata}\LibkiPrintManager\logs"
 
 [Files]
 Source: "LibkiPrintManager.exe"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
