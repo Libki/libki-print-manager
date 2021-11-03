@@ -8,16 +8,31 @@
 #include <QDir>
 #include <QFileInfoList>
 #include <iostream>
+#include <QStandardPaths>
 
 namespace LogUtils
 {
   static QString logFileName;
+  static QString logFolderName;
 
   void initLogFileName()
   {
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    if (path.isEmpty()) qFatal("Cannot determine settings storage location");
+    QDir d = QDir(path);
+    QString appDataPath = d.absolutePath();
+
+    logFolderName = appDataPath + "/logs";
+
     logFileName = QString(logFolderName + "/Log_%1__%2.txt")
                   .arg(QDate::currentDate().toString("yyyy_MM_dd"))
                   .arg(QTime::currentTime().toString("hh_mm_ss_zzz"));
+
+    qDebug() << "LOG DIR NAME: " << logFolderName;
+    qDebug() << "LOG FILE NAME: " << logFileName;
+
+    d.mkpath(d.absolutePath());
+    qDebug() << "LOG DIR EXISTS: " << QDir(logFolderName).exists();
   }
 
   void deleteOldLogs()
@@ -47,6 +62,7 @@ namespace LogUtils
       // Create folder for logfiles if not exists
       if(!QDir(logFolderName).exists())
       {
+        qDebug() << "Creating directory " << logFolderName;
         QDir().mkdir(logFolderName);
       }
 

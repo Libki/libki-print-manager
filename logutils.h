@@ -12,8 +12,6 @@
 
 namespace LogUtils
 {
-    const QString logFolderName = "logs";
-
     bool initLogging();
     void myMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString& msg);
 }

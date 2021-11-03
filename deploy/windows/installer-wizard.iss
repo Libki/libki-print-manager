@@ -13,6 +13,9 @@ OutputBaseFilename=Libki_Print_Manager_Installer
 Compression=lzma
 AllowNoIcons=yes
 
+[Dirs]
+Name: "{commonappdata}\logs"
+
 [Files]
 Source: "LibkiPrintManager.exe"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
 Source: "SumatraPDF.exe"; DestDir: "{app}"; Flags: ignoreversion; MinVersion: 0.0,5.0
