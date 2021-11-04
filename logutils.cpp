@@ -1,5 +1,6 @@
-
 #include "logutils.h"
+
+#include <iostream>
 
 #include <QTime>
 #include <QFile>
@@ -7,13 +8,13 @@
 #include <QDebug>
 #include <QDir>
 #include <QFileInfoList>
-#include <iostream>
 #include <QStandardPaths>
 
 namespace LogUtils
 {
   static QString logFileName;
   static QString logFolderName;
+  static QFile* logFile;
 
   void initLogFileName()
   {
@@ -31,7 +32,7 @@ namespace LogUtils
     qDebug() << "LOG DIR NAME: " << logFolderName;
     qDebug() << "LOG FILE NAME: " << logFileName;
 
-    d.mkpath(d.absolutePath());
+    d.mkpath(logFolderName);
     qDebug() << "LOG DIR EXISTS: " << QDir(logFolderName).exists();
   }
 
@@ -59,6 +60,7 @@ namespace LogUtils
 
   bool initLogging()
   {
+      qDebug() << "LogUtils::initLogging()";
       // Create folder for logfiles if not exists
       if(!QDir(logFolderName).exists())
       {
@@ -69,8 +71,8 @@ namespace LogUtils
       deleteOldLogs(); //delete old log files
       initLogFileName(); //create the logfile name
 
-      QFile outFile(logFileName);
-      if(outFile.open(QIODevice::WriteOnly | QIODevice::Append))
+      logFile = new QFile( logFileName );
+      if(logFile->open(QIODevice::WriteOnly | QIODevice::Append))
       {
         qInstallMessageHandler(LogUtils::myMessageHandler);
         return true;
@@ -85,10 +87,7 @@ namespace LogUtils
   {
     //check file size and if needed create new log!
     {
-      QFile outFileCheck(logFileName);
-      int size = outFileCheck.size();
-
-      if (size > LOGSIZE) //check current log size
+      if (logFile->size() > LOGSIZE) //check current log size
       {
         deleteOldLogs();
         initLogFileName();
@@ -119,9 +118,11 @@ namespace LogUtils
         .arg(message)
         .arg(QDateTime::currentDateTime().toString(Qt::ISODate));
 
-    QFile outFile(logFileName);
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-    QTextStream ts(&outFile);
+    // Output to console
+    QTextStream(stdout) << text << endl;
+
+    // Output to log file
+    QTextStream ts(logFile);
     ts << text << endl;
   }
 }
