@@ -3,8 +3,8 @@ IDI_ICON1               ICON    DISCARDABLE     "images/icons/libki.ico"
 #include <windows.h>
 
 VS_VERSION_INFO     VERSIONINFO
-FILEVERSION         1, 0, 2, 0
-PRODUCTVERSION      1, 0, 2, 0
+FILEVERSION         1, 1, 0, 0
+PRODUCTVERSION      1, 1, 0, 0
 FILEFLAGSMASK       0x3fL
 FILEFLAGS           0
 FILEOS              VOS_NT_WINDOWS32
@@ -21,9 +21,9 @@ BEGIN
         BLOCK   "040904b0"
         BEGIN
             VALUE   "ProductName",      		"Libki Print Manager\0"
-            VALUE   "ProductVersion",   		"v1.0.2\0"
+            VALUE   "ProductVersion",   		"v1.1.0\0"
 			VALUE   "FileDescription",  		"Libki Print Manager\0"
-			VALUE   "FileVersion",      		"1.0.2\0"
+			VALUE   "FileVersion",      		"1.1.0\0"
             VALUE   "InternalName",     		"Libki Print Manager\0"
             VALUE   "LegalCopyright",   		"Copyright 2021 Kyle M Hall\0"
         END
