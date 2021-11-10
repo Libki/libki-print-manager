@@ -173,3 +173,8 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     }
 }
 
+void NetworkClient::handleSslErrors(QNetworkReply *reply, QList<QSslError> error ) {
+  qDebug("NetworkClient::handleSslErrors");
+  reply->ignoreSslErrors(error);
+}
+

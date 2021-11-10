@@ -28,7 +28,7 @@ private slots:
     void checkServerForPrintJobs();
     void onCheckServerForPrintJobsResult(QNetworkReply *reply);
     void downloadPrintFileFinished(QNetworkReply *reply);
-
+    void handleSslErrors(QNetworkReply* reply,QList<QSslError> error);
 };
 
 #endif // NETWORKCLIENT_H
