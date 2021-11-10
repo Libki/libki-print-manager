@@ -54,6 +54,7 @@ Filename: "{commonappdata}\Libki\Libki Print Manager.ini"; Section: "settings"; 
 [Code]
 var
   ServerPage: TInputQueryWizardPage;
+  ClientPage: TInputQueryWizardPage;
 
 procedure InitializeWizard;
 begin
