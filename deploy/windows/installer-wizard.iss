@@ -48,6 +48,8 @@ AssocingFileExtension=Associating %1 with the %2 file extension...
 
 [INI]
 Filename: "{commonappdata}\Libki\Libki Print Manager.ini"; Section: "settings"; Key: "server"; String: "{code:GetScheme}://{code:GetHost}:{code:GetPort}"
+Filename: "{commonappdata}\Libki\Libki Print Manager.ini"; Section: "settings"; Key: "name"; String: "{code:GetName}"
+Filename: "{commonappdata}\Libki\Libki Print Manager.ini"; Section: "settings"; Key: "api_key"; String: "{code:GetApiKey}"
 
 [Code]
 var
@@ -63,6 +65,8 @@ begin
   ServerPage.Add('Scheme:', False);
   ServerPage.Add('Host:', False);
   ServerPage.Add('Port:', False);
+  ServerPage.Add('Name:', False);
+  ServerPage.Add('API Key:', False);
   
   { Set default values, using settings that were stored last time if possible }
 end;
@@ -80,4 +84,14 @@ end;
 function GetPort(Param: String): String;
 begin
   Result := ServerPage.Values[2];
+end;
+
+function GetName(Param: String): String;
+begin
+  Result := ServerPage.Values[3];
+end;
+
+function GetApiKey(Param: String): String;
+begin
+  Result := ServerPage.Values[4];
 end;
