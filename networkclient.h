@@ -16,6 +16,8 @@ private:
     QTimer *checkServerForPrintJobsTimer;
     void downloadPrintFile(QJsonObject job);
     QString libkiServerAddress;
+    QString printManagerName;
+    QString printManagerApiKey;
     QNetworkAccessManager *namCheckServerForPrintJobs;
     QNetworkAccessManager *namDownloadPrintFileFinished;
     QNetworkAccessManager *namJobStatus;
