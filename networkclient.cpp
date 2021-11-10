@@ -21,9 +21,11 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 
     namCheckServerForPrintJobs = new QNetworkAccessManager(this);
     connect(namCheckServerForPrintJobs, &QNetworkAccessManager::finished, this, &NetworkClient::onCheckServerForPrintJobsResult);
+    connect(namCheckServerForPrintJobs, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(handleSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     namDownloadPrintFileFinished = new QNetworkAccessManager(this);
     connect(namDownloadPrintFileFinished, &QNetworkAccessManager::finished, this, &NetworkClient::downloadPrintFileFinished);
+    connect(namDownloadPrintFileFinished, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(handleSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     checkServerForPrintJobsTimer = new QTimer(this);
     connect(checkServerForPrintJobsTimer, SIGNAL(timeout()), this, SLOT(checkServerForPrintJobs()));
@@ -104,7 +106,6 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
 
 void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     qDebug() << "NetworkClient::downloadPrintFileFinished";
-
 
     if (reply->error() == QNetworkReply::NoError){
         qDebug() << "1) " << reply->header(QNetworkRequest::ContentTypeHeader).toString();
