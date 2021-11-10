@@ -65,8 +65,12 @@ begin
   ServerPage.Add('Scheme:', False);
   ServerPage.Add('Host:', False);
   ServerPage.Add('Port:', False);
-  ServerPage.Add('Name:', False);
-  ServerPage.Add('API Key:', False);
+  
+  ClientPage := CreateInputQueryPage(ServerPage.ID,
+    'Client Information', 'Libki client data',
+    'Please specify the Libki client data.');
+  ClientPage.Add('Name:', False);
+  ClientPage.Add('API Key:', False);
   
   { Set default values, using settings that were stored last time if possible }
 end;
@@ -88,10 +92,10 @@ end;
 
 function GetName(Param: String): String;
 begin
-  Result := ServerPage.Values[3];
+  Result := ClientPage.Values[0];
 end;
 
 function GetApiKey(Param: String): String;
 begin
-  Result := ServerPage.Values[4];
+  Result := ClientPage.Values[1];
 end;
