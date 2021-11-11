@@ -12,12 +12,14 @@
 #include <QDir>
 #include <QProcess>
 #include <QSettings>
+#include <QFileInfo>
 
 NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 {
     qDebug() << "NetworkClient::NetworkClient";
 
     namJobStatus = new QNetworkAccessManager(this);
+    connect(namJobStatus, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(handleSslErrors(QNetworkReply*, const QList<QSslError> & )));
 
     namCheckServerForPrintJobs = new QNetworkAccessManager(this);
     connect(namCheckServerForPrintJobs, &QNetworkAccessManager::finished, this, &NetworkClient::onCheckServerForPrintJobsResult);
@@ -107,6 +109,10 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
 void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     qDebug() << "NetworkClient::downloadPrintFileFinished";
 
+    QSettings settings;
+    settings.setIniCodec("UTF-8");
+    QString tempDir = settings.value("settings/tempdir").toString();
+
     if (reply->error() == QNetworkReply::NoError){
         qDebug() << "1) " << reply->header(QNetworkRequest::ContentTypeHeader).toString();
         qDebug() << "2) " << reply->header(QNetworkRequest::LastModifiedHeader).toDateTime().toString();
@@ -123,8 +129,10 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         //QString jobId = reply->rawHeader("File-Id");
         QString jobId = QString::number( job["job_id"].toInt() );
         qDebug() << "FILE ID: " + jobId;
+        QString printer = job["printer"].toString();
+        qDebug() << "VIRTUAL PRINTER NAME: " << printer;
         QString physicalPrinterName = job["physical_printer_name"].toString();
-        qDebug() << "PRINTER NAME: " << physicalPrinterName;
+        qDebug() << "PHYSICAL PRINTER NAME: " << physicalPrinterName;
         QString chroming = job["chroming"].toString();
         qDebug() << "CHROMING: " << chroming;
         QString plexing = job["plexing"].toString();
@@ -140,10 +148,16 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         QNetworkRequest req = QNetworkRequest(QUrl(url));
         namJobStatus->get(req);
 
-        QString tempDir = QDir::tempPath();
-        qDebug() << "Temp Dir: " << tempDir;
+        if ( tempDir.isEmpty() ) {
+            tempDir = QDir::tempPath();
+        }
+        tempDir = tempDir + "/" + printer;
+        QDir(tempDir).mkpath(tempDir);
+        qDebug() << "TEMP DIR " << tempDir << " EXISTS: " <<  QDir(tempDir).exists();
 
         QString tempFile = tempDir + "/" + jobId + ".pdf";
+        QFileInfo fi(tempFile);
+        tempFile = fi.absoluteFilePath();
         QFile localFile(tempFile);
         if (localFile.open(QIODevice::WriteOnly)) {
            localFile.write(reply->readAll());
@@ -156,7 +170,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         QProcess sumatra;
         qDebug() << "PRINTING TO START";
         QString command = QString("SumatraPDF.exe -silent  -print-settings \"%1,%2\" -print-to %3 %4").arg(chroming, plexing, physicalPrinterName, tempFile);
-        qDebug() << "PRINT COMMAND: " << command;
+        qDebug().noquote() << "PRINT COMMAND: " << command;
         sumatra.start(command);
         sumatra.waitForStarted();
         qDebug() << "PRINTING STARTED";
@@ -196,7 +210,6 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 }
 
 void NetworkClient::handleSslErrors(QNetworkReply *reply, QList<QSslError> error ) {
-  qDebug("NetworkClient::handleSslErrors");
   reply->ignoreSslErrors(error);
 }
 
