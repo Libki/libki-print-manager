@@ -6,6 +6,7 @@
 #include <QSettings>
 #include <QFile>
 #include <QTextStream>
+#include <QObject>
 
 int main(int argc, char *argv[])
 {
@@ -24,6 +25,8 @@ int main(int argc, char *argv[])
 
     SystemTray st;
     NetworkClient nc;
+
+    QObject::connect(&nc, &NetworkClient::requestShowTrayMessage, &st, &SystemTray::showTrayMessage);
 
     return a.exec();
 }

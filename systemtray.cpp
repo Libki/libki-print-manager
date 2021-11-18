@@ -19,8 +19,7 @@ SystemTray::SystemTray(QObject *parent) : QObject(parent)
     connect(quitAction, SIGNAL(triggered()), this, SLOT(doQuitAction()));
     trayIconMenu->addAction(quitAction);
 
-    QSystemTrayIcon *trayIcon;
-    trayIcon = new QSystemTrayIcon();
+    trayIcon = new QSystemTrayIcon(this);
     trayIcon->setContextMenu(trayIconMenu);
     trayIcon->setIcon(libkiIcon);
     trayIcon->show();
@@ -55,4 +54,9 @@ void SystemTray::doAboutAction() {
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     msgBox.exec();
+}
+
+void SystemTray::showTrayMessage(QString title, QString message) {
+    qDebug() << "SystemTray::showTrayMessage";
+    trayIcon->showMessage(title, message, QSystemTrayIcon::Information, 1000);
 }

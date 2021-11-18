@@ -41,6 +41,7 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
 
     qDebug() << "LIBKI SERVER ADDRESS: " << libkiServerAddress;
     qDebug() << "PRINT MANAGER NAME: " << printManagerName;
+    emit requestShowTrayMessage("Libki Print Manager", "Starting up");
 }
 
 void NetworkClient::checkServerForPrintJobs() {
@@ -94,6 +95,9 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
     QString print_file_id = QString(QString::number(job["print_file_id"].toInt()));
     qDebug() << "Print File ID: " << print_file_id;
 
+    QString print_job_id = QString(QString::number(job["job_id"].toInt()));
+    emit requestShowTrayMessage("Libki Print Manager", "Downloading print job " + print_job_id);
+
     QUrlQuery query;
     query.addQueryItem("name", printManagerName);
     query.addQueryItem("api_key", printManagerApiKey);
@@ -137,6 +141,8 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "CHROMING: " << chroming;
         QString plexing = job["plexing"].toString();
         qDebug() << "PLEXING: " << plexing;
+
+        emit requestShowTrayMessage("Libki Print Manager", "Printing job " + jobId);
 
         QUrlQuery query;
         query.addQueryItem("name", printManagerName);

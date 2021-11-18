@@ -23,6 +23,7 @@ private:
     QNetworkAccessManager *namJobStatus;
 
 signals:
+    void requestShowTrayMessage(QString title, QString message);
 
 public slots:
 
