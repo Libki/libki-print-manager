@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1]
+### Changed
+- Print Manager can handle printers and file paths containing spaces
+
 ## [1.3.0] [r22.08]
 ### Added
 - First release!
