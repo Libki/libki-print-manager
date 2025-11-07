@@ -143,6 +143,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "PLEXING: " << plexing;
         QString copies = job["copies"].toString();
         qDebug() << "COPIES: " << copies;
+        qDebug() << "COPIES: " << job["copies"].toInt();
 
         emit requestShowTrayMessage("Libki Print Manager", "Printing job " + jobId);
 
