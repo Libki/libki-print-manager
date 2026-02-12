@@ -182,7 +182,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         sumatra.start(command);
         sumatra.waitForStarted();
         qDebug() << "PRINTING STARTED";
-        sumatra.waitForFinished();
+        sumatra.waitForFinished(-1);
         qDebug() << "PRINTING DONE!";
         qDebug() << "EXIT STATUS: " << sumatra.exitCode();
 
