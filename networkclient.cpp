@@ -38,6 +38,7 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
     libkiServerAddress = settings.value("settings/server").toString();
     printManagerName = settings.value("settings/name").toString();
     printManagerApiKey = settings.value("settings/api_key").toString();
+    customHeaderName = settings.value("settings/customHeaderName").toString();
 
     qDebug() << "LIBKI SERVER ADDRESS: " << libkiServerAddress;
     qDebug() << "PRINT MANAGER NAME: " << printManagerName;
@@ -56,7 +57,7 @@ void NetworkClient::checkServerForPrintJobs() {
 
     qDebug()<< "url: "<< url.toString(QUrl::FullyEncoded);
 
-    namCheckServerForPrintJobs->get(QNetworkRequest(url));
+    namCheckServerForPrintJobs->get(buildRequest(url));
 }
 
 void NetworkClient::onCheckServerForPrintJobsResult(QNetworkReply *reply){
@@ -106,7 +107,7 @@ void NetworkClient::downloadPrintFile(QJsonObject job) {
     url.setQuery(query);
 
     qDebug() << "DOWNLOADING PDF FROM URL: " << url.toString();
-    QNetworkReply* reply = namDownloadPrintFileFinished->get(QNetworkRequest(url));
+    QNetworkReply* reply = namDownloadPrintFileFinished->get(buildRequest(url));
     reply->setProperty("job", job);
 }
 
@@ -153,7 +154,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         QUrl url = QUrl(QString("%1/api/printmanager/v1_0/job/%2/InProgress").arg(libkiServerAddress, jobId));
         qDebug() << "IN PROGRESS URL: " << url;
 
-        QNetworkRequest req = QNetworkRequest(QUrl(url));
+        QNetworkRequest req = buildRequest(QUrl(url));
         namJobStatus->get(req);
 
         if ( tempDir.isEmpty() ) {
@@ -190,7 +191,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
             url = QUrl(QString("%1/api/printmanager/v1_0/job/%2/Done").arg(libkiServerAddress, jobId));
             url.setQuery(query);
 
-            req = QNetworkRequest(url);
+            req = buildRequest(url);
             qDebug() << "DONE URL: " << url;
             qDebug() << "PRINTING " << tempFile << " SUCEEDED!";
 
@@ -200,7 +201,7 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
             url = QUrl(QString("%1/api/printmanager/v1_0/job/%2/Error").arg(libkiServerAddress, jobId));
             url.setQuery(query);
 
-            req = QNetworkRequest(url);
+            req = buildRequest(url);
             qDebug() << "PRINTING " << tempFile << " FAILED!";
             qDebug() << "ERROR URL: " << url;
 
@@ -215,6 +216,14 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
     } else {
         qDebug() << "ERROR: " << reply->errorString();
     }
+}
+
+QNetworkRequest NetworkClient::buildRequest(const QUrl &url) const {
+  QNetworkRequest request(url);
+  if (!customHeaderName.isEmpty()) {
+    request.setRawHeader(customHeaderName.toUtf8(), customHeaderValue.toUtf8());
+  }
+  return request;
 }
 
 void NetworkClient::handleSslErrors(QNetworkReply *reply, QList<QSslError> error ) {
