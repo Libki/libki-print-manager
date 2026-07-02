@@ -18,9 +18,13 @@ private:
     QString libkiServerAddress;
     QString printManagerName;
     QString printManagerApiKey;
+    QString customHeaderName;
+    QString customHeaderValue;
     QNetworkAccessManager *namCheckServerForPrintJobs;
     QNetworkAccessManager *namDownloadPrintFileFinished;
     QNetworkAccessManager *namJobStatus;
+
+    QNetworkRequest buildRequest(const QUrl &url) const;
 
 signals:
     void requestShowTrayMessage(QString title, QString message);
