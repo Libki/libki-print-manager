@@ -39,6 +39,7 @@ NetworkClient::NetworkClient(QObject *parent) : QObject(parent)
     printManagerName = settings.value("settings/name").toString();
     printManagerApiKey = settings.value("settings/api_key").toString();
     customHeaderName = settings.value("settings/customHeaderName").toString();
+    customHeaderValue = settings.value("settings/customHeaderValue").toString();
 
     qDebug() << "LIBKI SERVER ADDRESS: " << libkiServerAddress;
     qDebug() << "PRINT MANAGER NAME: " << printManagerName;
