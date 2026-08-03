@@ -9,12 +9,19 @@
 #include <QDir>
 #include <QFileInfoList>
 #include <QStandardPaths>
+#include <QSettings>
 
 namespace LogUtils
 {
   static QString logFileName;
   static QString logFolderName;
   static QFile* logFile;
+  static LogUtils::LogLevel currentLogLevel = LogUtils::DebugLevel;
+
+  LogUtils::LogLevel logLevel()
+  {
+      return currentLogLevel;
+  }
 
   void initLogFileName()
   {
@@ -68,6 +75,29 @@ namespace LogUtils
         QDir().mkdir(logFolderName);
       }
 
+      QSettings settings;
+      QString level =
+          settings.value("logging/level", "debug")
+              .toString()
+              .trimmed()
+              .toLower();
+
+      if (level == "debug")
+          currentLogLevel = DebugLevel;
+      else if (level == "warning")
+          currentLogLevel = WarningLevel;
+      else if (level == "error")
+          currentLogLevel = ErrorLevel;
+      else if (level == "off")
+          currentLogLevel = OffLevel;
+      else
+          currentLogLevel = DebugLevel;
+
+      fprintf(stderr,
+              "Configured log level = %d\n",
+              (int)currentLogLevel);
+
+
       deleteOldLogs(); //delete old log files
       initLogFileName(); //create the logfile name
 
@@ -92,6 +122,33 @@ namespace LogUtils
         deleteOldLogs();
         initLogFileName();
       }
+    }
+
+    switch (type) {
+    case QtDebugMsg:
+        if (currentLogLevel > DebugLevel)
+            return;
+        break;
+
+    case QtWarningMsg:
+        if (currentLogLevel > WarningLevel)
+            return;
+        break;
+
+    case QtCriticalMsg:
+        if (currentLogLevel > ErrorLevel)
+            return;
+        break;
+
+    case QtFatalMsg:
+        break;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+      case QtInfoMsg:
+          if (currentLogLevel > DebugLevel)
+              return;
+          break;
+#endif
     }
 
     QString levelText;

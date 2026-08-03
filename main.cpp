@@ -13,12 +13,12 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
 
-    LogUtils::initLogging();
-
     QCoreApplication::setOrganizationName("Libki");
     QCoreApplication::setOrganizationDomain("libki.org");
     QCoreApplication::setApplicationName("Libki Print Manager");
     QSettings::setDefaultFormat(QSettings::IniFormat);
+
+    LogUtils::initLogging();
 
     QSettings settings;
     settings.setIniCodec("UTF-8");
