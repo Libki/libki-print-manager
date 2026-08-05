@@ -181,10 +181,15 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 
         QProcess sumatra;
         qDebug() << "PRINTING TO START";
-        QStringList printSettings = {chroming, plexing, copies += "x"};
-        if (pageRange != "") {
-            printSettings.append(pageRange);
+        QStringList printSettings;
+        printSettings << chroming
+                      << plexing
+                      << (copies + "x");
+
+        if (!pageRange.isEmpty()) {
+            printSettings << pageRange;
         }
+
         QString command = QString("SumatraPDF.exe -silent  -print-settings \"%1\" -print-to \"%2\" \"%3\"").arg(printSettings.join(","), physicalPrinterName, tempFile);
         qDebug().noquote() << "PRINT COMMAND: " << command;
         sumatra.start(command);
