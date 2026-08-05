@@ -145,6 +145,8 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
         qDebug() << "PLEXING: " << plexing;
         QString copies = QString::number(job["copies"].toInt());
         qDebug() << "COPIES: " << copies;
+        QString pageRange = job["page_range"].toString();
+        qDebug() << "PAGE RANGE: " << pageRange;
 
         emit requestShowTrayMessage("Libki Print Manager", "Printing job " + jobId);
 
@@ -179,7 +181,11 @@ void NetworkClient::downloadPrintFileFinished(QNetworkReply *reply) {
 
         QProcess sumatra;
         qDebug() << "PRINTING TO START";
-        QString command = QString("SumatraPDF.exe -silent  -print-settings \"%1,%2,%5x\" -print-to \"%3\" \"%4\"").arg(chroming, plexing, physicalPrinterName, tempFile, copies);
+        QStringList printSettings = {chroming, plexing, copies += "x"};
+        if (pageRange != "") {
+            printSettings.append(pageRange);
+        }
+        QString command = QString("SumatraPDF.exe -silent  -print-settings \"%1\" -print-to \"%2\" \"%3\"").arg(printSettings.join(","), physicalPrinterName, tempFile);
         qDebug().noquote() << "PRINT COMMAND: " << command;
         sumatra.start(command);
         sumatra.waitForStarted();
